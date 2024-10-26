@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { fetchApiGet } from "@/common/services/fetch-api";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function TransportsLayout() {
   const [transports, setTransports] = useState([]);
@@ -15,11 +16,8 @@ export default function TransportsLayout() {
     (async () => {
       try {
         setLoading(true);
-
         const endpoint = `/transports`;
-
         const data = await fetchApiGet({ endpoint });
-
         setTransports(data);
       } catch (error) {
         console.log(error);
@@ -42,25 +40,21 @@ export default function TransportsLayout() {
     return (
       <div>
         <p>Error:</p>
-        <div className="">{JSON.stringify(error)}</div>
+        <div>{JSON.stringify(error)}</div>
       </div>
     );
   }
 
   return (
-    <>
-      <h1>Transport List</h1>
-      <Link href={"/transports/new"}>
-        <button>Create new</button>{" "}
-      </Link>
-      <table
-        style={{
-          width: "100%",
-          borderCollapse: "collapse",
-          marginTop: "20px",
-          padding: "20px 100px",
-        }}
-      >
+    <div style={layoutStyle}>
+      <h1 style={titleStyle}>Transport List</h1>
+      <div style={buttonContainerStyle}>
+        <Link href="/transports/new">
+          <button style={buttonStyle}>Create new</button>
+        </Link>
+      </div>
+
+      <table style={tableStyle}>
         <thead>
           <tr>
             <th style={headerCellStyle}>Image</th>
@@ -75,50 +69,91 @@ export default function TransportsLayout() {
             <tr
               key={transport.id}
               onClick={() => handleRowClick(transport.id)}
-              style={{
-                cursor: "pointer",
-                transition: "background 0.3s",
-              }}
+              style={rowStyle}
             >
-              <td style={cellStyle}>{transport.name}</td>
-              <td style={cellStyle}>{transport.description}</td>
-              <td style={cellStyle}>{transport.peopleCapacity}</td>
-              <td style={cellStyle}>{transport.type}</td>
               <td style={cellStyle}>
                 {transport.photoUrl ? (
-                  <img
-                    src={transport.photoUrl}
-                    alt={transport.name}
-                    style={{
-                      width: "80px",
-                      height: "auto",
-                      borderRadius: "8px",
-                    }}
-                  />
+                  <img src={transport.photoUrl} alt={transport.name} style={imageStyle} />
                 ) : (
                   "No Image"
                 )}
               </td>
+              <td style={cellStyle}>{transport.name}</td>
+              <td style={cellStyle}>{transport.description}</td>
+              <td style={cellStyle}>{transport.peopleCapacity}</td>
+              <td style={cellStyle}>{transport.type}</td>
             </tr>
           ))}
         </tbody>
       </table>
-    </>
+    </div>
   );
 }
 
+// Стилі
+const layoutStyle = {
+  fontFamily: "'Roboto', sans-serif",
+  color: "#F0F0F0",
+  backgroundColor: "#1A1A1D",
+  padding: "20px 50px",
+  minHeight: "100vh",
+};
+
+const titleStyle = {
+  color: "#FFA500",
+  fontSize: "36px",
+  fontWeight: "700",
+  textAlign: "center",
+  margin: "20px 0",
+};
+
+const buttonContainerStyle = {
+  display: "flex",
+  justifyContent: "center",
+  marginBottom: "20px",
+};
+
+const buttonStyle = {
+  backgroundColor: "#FFA500",
+  color: "#1A1A1D",
+  padding: "16px 32px",
+  fontSize: "20px",
+  fontWeight: "600",
+  border: "none",
+  borderRadius: "8px",
+  cursor: "pointer",
+};
+
+const tableStyle = {
+  width: "100%",
+  borderCollapse: "collapse",
+  marginTop: "20px",
+};
+
 const headerCellStyle = {
-  padding: "10px",
+  padding: "16px",
   fontWeight: "bold",
   textAlign: "left" as const,
-  borderBottom: "2px solid #ddd",
-  color: "#333",
-  fontSize: "14px",
+  borderBottom: "2px solid #FFA500",
+  color: "#FFA500",
+  fontSize: "18px",
 };
 
 const cellStyle = {
-  padding: "12px",
-  borderBottom: "1px solid #ddd",
-  color: "#555",
-  fontSize: "14px",
+  padding: "18px",
+  backgroundColor: "#2E2E2E",
+  color: "#FFFFFF",
+  fontSize: "18px",
+  borderBottom: "10px solid transparent",
+};
+
+const rowStyle = {
+  cursor: "pointer",
+  transition: "background 0.3s",
+};
+
+const imageStyle = {
+  width: "160px",
+  height: "auto",
+  borderRadius: "8px",
 };

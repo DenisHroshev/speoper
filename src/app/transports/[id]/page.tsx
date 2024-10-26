@@ -1,7 +1,8 @@
 "use client";
 import { useParams } from "next/navigation";
-import TransportsLayout from "@/app/transports/common/components/transport-form";
 import { useEffect, useState } from "react";
+import {TransportTypes} from "@/app/transports/common/constants/transport-types.enum"
+import React from "react";
 import { fetchApiGet, fetchApiPatch } from "@/common/services/fetch-api";
 import { Transport } from "@/app/transports/common/types/transport.type";
 
@@ -20,11 +21,8 @@ export default function TransportByIdLayout() {
         }
 
         setLoading(true);
-
         const endpoint = `/transports/${transportId}`;
-
         const data = await fetchApiGet({ endpoint });
-
         setTransport(data);
       } catch (error) {
         setError(error);
@@ -69,10 +67,20 @@ export default function TransportByIdLayout() {
     return (
       <div>
         <p>Error:</p>
-        <div>{error.message}</div>
+        <div>{JSON.stringify(error)}</div>
       </div>
     );
   }
+
+  return (
+    <div style={containerStyle}>
+      <div style={formContainerStyle}>
+        <h1 style={titleStyle}>Transport</h1>
+        <TransportsLayout transportData={transport} onSubmit={onSubmit} />
+      </div>
+    </div>
+  );
+}
 
   return (
     <TransportsLayout
@@ -82,3 +90,68 @@ export default function TransportByIdLayout() {
     />
   );
 }
+
+// Стилі для контейнера, форми, полів введення і кнопки
+const containerStyle = {
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  height: "100vh",
+  backgroundColor: "#1A1A1D",
+};
+
+const formContainerStyle = {
+  width: "500px", // Ширина форми
+  padding: "40px",
+  backgroundColor: "#2E2E2E",
+  borderRadius: "12px",
+  boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)",
+  textAlign: "center",
+};
+
+const titleStyle = {
+  color: "#FFA500",
+  fontSize: "36px",
+  fontWeight: "bold",
+  marginBottom: "20px",
+};
+
+const formStyle = {
+  display: "flex",
+  flexDirection: "column",
+};
+
+const labelStyle = {
+  color: "#F0F0F0",
+  fontSize: "16px",
+  marginBottom: "8px",
+  textAlign: "left",
+};
+
+const inputStyle = {
+  width: "100%",
+  padding: "12px",
+  marginBottom: "20px",
+  fontSize: "16px",
+  borderRadius: "8px",
+  border: "1px solid #333",
+  backgroundColor: "#1A1A1D",
+  color: "#F0F0F0",
+};
+
+const selectStyle = {
+  ...inputStyle,
+};
+
+const buttonStyle = {
+  width: "100%",
+  padding: "14px",
+  fontSize: "18px",
+  fontWeight: "bold",
+  color: "#1A1A1D",
+  backgroundColor: "#FFA500",
+  border: "none",
+  borderRadius: "10px",
+  cursor: "pointer",
+  transition: "background 0.3s",
+};
