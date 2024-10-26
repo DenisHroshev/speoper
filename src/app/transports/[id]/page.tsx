@@ -1,13 +1,18 @@
 "use client";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import {TransportTypes} from "@/app/transports/common/constants/transport-types.enum"
 import React from "react";
-import { fetchApiGet, fetchApiPatch } from "@/common/services/fetch-api";
+import {
+  fetchApiDelete,
+  fetchApiGet,
+  fetchApiPatch,
+} from "@/common/services/fetch-api";
 import { Transport } from "@/app/transports/common/types/transport.type";
+import TransportForm from "@/app/transports/common/components/transport-form";
 
 export default function TransportByIdLayout() {
   const params = useParams();
+  const router = useRouter();
   const transportId = params.id;
   const [transport, setTransport] = useState({});
   const [loading, setLoading] = useState(true);
@@ -59,15 +64,31 @@ export default function TransportByIdLayout() {
     }
   };
 
+  const onDelete = async (transportId: string) => {
+    try {
+      setLoading(true);
+
+      const endpoint = `/transports/${transportId}`;
+
+      await fetchApiDelete({ endpoint });
+
+      router.back();
+    } catch (error) {
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (loading) {
     return "VETALIK LOADITSA...";
   }
 
-  if (error) {
+  if (error || !transport) {
     return (
       <div>
         <p>Error:</p>
-        <div>{JSON.stringify(error)}</div>
+        <div>{error.message}</div>
       </div>
     );
   }
@@ -76,18 +97,14 @@ export default function TransportByIdLayout() {
     <div style={containerStyle}>
       <div style={formContainerStyle}>
         <h1 style={titleStyle}>Transport</h1>
-        <TransportsLayout transportData={transport} onSubmit={onSubmit} />
+        <TransportForm
+          transportData={transport}
+          onSubmit={onSubmit}
+          submitButtonText={"Update"}
+          onDelete={onDelete}
+        />
       </div>
     </div>
-  );
-}
-
-  return (
-    <TransportsLayout
-      transportData={transport}
-      onSubmit={onSubmit}
-      submitButtonText={"Update"}
-    />
   );
 }
 

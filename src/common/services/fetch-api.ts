@@ -18,8 +18,6 @@ export const fetchApi = async ({ endpoint, options, body }: FetchApiProps) => {
     },
   };
 
-  console.log(preparedOptions);
-
   const response = await fetch(url, preparedOptions);
   return response.json();
 };

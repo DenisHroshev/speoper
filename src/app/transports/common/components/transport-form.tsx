@@ -7,6 +7,7 @@ interface TransportsLayoutProps {
   submitButtonText: string;
   isNew: boolean;
   onSubmit: (arg1: Transport) => void | Promise<void>;
+  onDelete?: (arg1: number) => void | Promise<void>;
 }
 
 const defaultFormState = {
@@ -17,11 +18,12 @@ const defaultFormState = {
   photoUrl: "",
 };
 
-export default function TransportsLayout({
+export default function TransportForm({
   transportData,
   onSubmit,
   submitButtonText = "Submit",
   isNew = false,
+  onDelete = () => {},
 }: TransportsLayoutProps) {
   const [formData, setFormData] = useState<Transport>(
     isNew ? defaultFormState : transportData,
@@ -57,7 +59,6 @@ export default function TransportsLayout({
         borderRadius: "8px",
       }}
     >
-      <h1 style={{ textAlign: "center" }}>Transport</h1>
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: "15px" }}>
           <label style={{ display: "block", marginBottom: "5px" }}>Name</label>
@@ -131,20 +132,45 @@ export default function TransportsLayout({
 
         {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
 
-        <button
-          type="submit"
+        <div
           style={{
-            width: "100%",
-            padding: "10px",
-            backgroundColor: "#4CAF50",
-            color: "#fff",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
           }}
         >
-          {submitButtonText}
-        </button>
+          <button
+            type="submit"
+            style={{
+              width: "100%",
+              padding: "10px",
+              backgroundColor: "#4CAF50",
+              color: "#fff",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer",
+            }}
+          >
+            {submitButtonText}
+          </button>
+
+          {!isNew && (
+            <button
+              onClick={() => onDelete(transportData?.id)}
+              style={{
+                width: "100%",
+                padding: "10px",
+                backgroundColor: "#aa2020",
+                color: "#fff",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+              }}
+            >
+              delete
+            </button>
+          )}
+        </div>
       </form>
     </div>
   );

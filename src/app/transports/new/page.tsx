@@ -1,6 +1,6 @@
 "use client";
 
-import TransportsLayout from "@/app/transports/common/components/transport-form";
+import TransportForm from "@/app/transports/common/components/transport-form";
 import { Transport } from "@/app/transports/common/types/transport.type";
 import { fetchApiPost } from "@/common/services/fetch-api";
 import { useState } from "react";
@@ -50,6 +50,6 @@ export default function TransportNewLayout() {
   }
 
   return (
-    <TransportsLayout isNew onSubmit={onSubmit} submitButtonText={"Create"} />
+    <TransportForm isNew onSubmit={onSubmit} submitButtonText={"Create"} />
   );
 }
