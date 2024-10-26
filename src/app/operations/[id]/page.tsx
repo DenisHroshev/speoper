@@ -50,7 +50,6 @@ export default function OperationByIdLayout() {
 
   const onSubmit = async (operationsUpdatePayload: Partial<Operation>) => {
     try {
-      console.log(operationsUpdatePayload);
       setLoading(true);
 
       const endpoint = `/operations/${operationId}`;
