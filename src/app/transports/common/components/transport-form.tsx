@@ -1,4 +1,4 @@
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { TransportTypes } from "@/app/transports/common/constants/transport-types.enum";
 import { Transport } from "@/app/transports/common/types/transport.type";
 
@@ -24,9 +24,10 @@ export default function TransportsLayout({
   isNew = false,
 }: TransportsLayoutProps) {
   const [formData, setFormData] = useState<Transport>(
-    // @ts-ignore
     isNew ? defaultFormState : transportData,
   );
+
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleChange = (e: { target: { name: any; value: any } }) => {
     const { name, value } = e.target;
@@ -35,8 +36,16 @@ export default function TransportsLayout({
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!formData.type) {
+      setErrorMessage("Please select a type");
+      return;
+    }
     onSubmit(formData);
   };
+
+  useEffect(() => {
+    setFormData(isNew ? defaultFormState : transportData);
+  }, [transportData]);
 
   return (
     <div
@@ -58,6 +67,7 @@ export default function TransportsLayout({
             value={formData.name}
             onChange={handleChange}
             style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
+            required
           />
         </div>
 
@@ -71,6 +81,7 @@ export default function TransportsLayout({
             value={formData.description}
             onChange={handleChange}
             style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
+            required
           />
         </div>
 
@@ -84,6 +95,7 @@ export default function TransportsLayout({
             value={formData.peopleCapacity}
             onChange={handleChange}
             style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
+            required
           />
         </div>
 
@@ -116,6 +128,8 @@ export default function TransportsLayout({
             style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
           />
         </div>
+
+        {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
 
         <button
           type="submit"

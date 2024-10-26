@@ -2,7 +2,8 @@
 import { useParams } from "next/navigation";
 import TransportsLayout from "@/app/transports/common/components/transport-form";
 import { useEffect, useState } from "react";
-import { fetchApi, fetchApiGet } from "@/common/services/fetch-api";
+import { fetchApiGet, fetchApiPatch } from "@/common/services/fetch-api";
+import { Transport } from "@/app/transports/common/types/transport.type";
 
 export default function TransportByIdLayout() {
   const params = useParams();
@@ -14,6 +15,10 @@ export default function TransportByIdLayout() {
   useEffect(() => {
     (async () => {
       try {
+        if (!transport || !Number(transportId)) {
+          setError(new Error("invalid transport ID"));
+        }
+
         setLoading(true);
 
         const endpoint = `/transports/${transportId}`;
@@ -22,7 +27,6 @@ export default function TransportByIdLayout() {
 
         setTransport(data);
       } catch (error) {
-        console.log(error);
         setError(error);
       } finally {
         setLoading(false);
@@ -30,7 +34,32 @@ export default function TransportByIdLayout() {
     })();
   }, []);
 
-  const onSubmit = async (transportUpdatePayload) => {};
+  const onSubmit = async (transportUpdatePayload: Partial<Transport>) => {
+    try {
+      setLoading(true);
+
+      const endpoint = `/transports/${transportId}`;
+
+      const formData = {
+        name: transportUpdatePayload.name,
+        description: transportUpdatePayload.description,
+        peopleCapacity: transportUpdatePayload.peopleCapacity,
+        type: transportUpdatePayload.type,
+        photoUrl: transportUpdatePayload.photoUrl,
+      };
+
+      const data = await fetchApiPatch({
+        endpoint,
+        body: formData,
+      });
+
+      setTransport(data);
+    } catch (error) {
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (loading) {
     return "VETALIK LOADITSA...";
@@ -40,10 +69,16 @@ export default function TransportByIdLayout() {
     return (
       <div>
         <p>Error:</p>
-        <div className="">{JSON.stringify(error)}</div>
+        <div>{error.message}</div>
       </div>
     );
   }
 
-  return <TransportsLayout transportData={transport} onSubmit={onSubmit} />;
+  return (
+    <TransportsLayout
+      transportData={transport}
+      onSubmit={onSubmit}
+      submitButtonText={"Update"}
+    />
+  );
 }
