@@ -6,15 +6,16 @@ export default function LoginPage() {
                 <form style={formStyle}>
                     <div style={formGroupStyle}>
                         <label htmlFor="username" style={labelStyle}>Username</label>
-                        <input type="text" id="username" name="username" style={inputStyle} />
+                        <input type="text" id="username" name="username" style={inputStyle}/>
                     </div>
 
                     <div style={formGroupStyle}>
                         <label htmlFor="password" style={labelStyle}>Password</label>
-                        <input type="password" id="password" name="password" style={inputStyle} />
+                        <input type="password" id="password" name="password" style={inputStyle}/>
                     </div>
 
                     <button type="submit" style={buttonStyle}>Login</button>
+                    <button type="submit" style={buttonStyle}>Register</button>
                 </form>
             </div>
         </div>
@@ -76,6 +77,7 @@ const inputStyle = {
 const buttonStyle = {
     width: "100%",
     padding: "14px",
+    margin: "14px 0 0 0",
     fontSize: "18px",
     fontWeight: "bold",
     color: "#1A1A1D",
@@ -86,8 +88,5 @@ const buttonStyle = {
     transition: "background 0.3s",
 };
 
-// Стан при наведенні на кнопку
-buttonStyle[":hover"] = {
-    backgroundColor: "#e69500",
-};
+
 
