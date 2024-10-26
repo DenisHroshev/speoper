@@ -25,9 +25,7 @@ export default function TransportForm({
   isNew = false,
   onDelete = () => {},
 }: TransportsLayoutProps) {
-  const [formData, setFormData] = useState<Transport>(
-    isNew ? defaultFormState : transportData,
-  );
+  const [formData, setFormData] = useState<Transport>({} as Transport);
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -46,7 +44,13 @@ export default function TransportForm({
   };
 
   useEffect(() => {
-    setFormData(isNew ? defaultFormState : transportData);
+    if (isNew) {
+      // @ts-ignore
+      setFormData(defaultFormState);
+    }
+    if (!isNew && transportData) {
+      setFormData(transportData);
+    }
   }, [transportData]);
 
   return (
@@ -156,7 +160,7 @@ export default function TransportForm({
 
           {!isNew && (
             <button
-              onClick={() => onDelete(transportData?.id)}
+              onClick={() => onDelete(transportData?.id as number)}
               style={{
                 width: "100%",
                 padding: "10px",

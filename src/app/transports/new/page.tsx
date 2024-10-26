@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 
 export default function TransportNewLayout() {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(false);
   const router = useRouter();
 
   const onSubmit = async (transportUpdatePayload: Partial<Transport>) => {
@@ -30,7 +30,8 @@ export default function TransportNewLayout() {
 
       router.back();
     } catch (error) {
-      setError(error);
+      // @ts-ignore
+      setErrorMessage(error.message);
     } finally {
       setLoading(false);
     }
@@ -40,11 +41,10 @@ export default function TransportNewLayout() {
     return "VETALIK LOADITSA...";
   }
 
-  if (error) {
+  if (errorMessage) {
     return (
       <div>
-        <p>Error:</p>
-        <div className="">{JSON.stringify(error)}</div>
+        <p>Error: ${errorMessage}</p>
       </div>
     );
   }

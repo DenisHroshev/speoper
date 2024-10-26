@@ -4,12 +4,12 @@ import { useEffect, useState } from "react";
 import { fetchApiGet } from "@/common/services/fetch-api";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
+import { Transport } from "@/app/transports/common/types/transport.type";
 
 export default function TransportsLayout() {
-  const [transports, setTransports] = useState([]);
+  const [transports, setTransports] = useState<Transport[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -20,8 +20,8 @@ export default function TransportsLayout() {
         const data = await fetchApiGet({ endpoint });
         setTransports(data);
       } catch (error) {
-        console.log(error);
-        setError(error);
+        // @ts-ignore
+        setErrorMessage(error.message);
       } finally {
         setLoading(false);
       }
@@ -36,11 +36,10 @@ export default function TransportsLayout() {
     return "VETALIK LOADITSA...";
   }
 
-  if (error) {
+  if (errorMessage) {
     return (
       <div>
-        <p>Error:</p>
-        <div>{JSON.stringify(error)}</div>
+        <p>Error:{errorMessage}</p>
       </div>
     );
   }
@@ -73,7 +72,11 @@ export default function TransportsLayout() {
             >
               <td style={cellStyle}>
                 {transport.photoUrl ? (
-                  <img src={transport.photoUrl} alt={transport.name} style={imageStyle} />
+                  <img
+                    src={transport.photoUrl}
+                    alt={transport.name}
+                    style={imageStyle}
+                  />
                 ) : (
                   "No Image"
                 )}
