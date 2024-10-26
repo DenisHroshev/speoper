@@ -1,4 +1,5 @@
 "use client";
+
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import React from "react";
@@ -16,21 +17,23 @@ export default function TransportByIdLayout() {
   const transportId = params.id;
   const [transport, setTransport] = useState({});
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<null | string>(null);
 
   useEffect(() => {
     (async () => {
       try {
         if (!transport || !Number(transportId)) {
-          setError(new Error("invalid transport ID"));
+          setErrorMessage("invalid transport ID");
         }
 
         setLoading(true);
         const endpoint = `/transports/${transportId}`;
         const data = await fetchApiGet({ endpoint });
+
+        console.log("FETCHED", data);
         setTransport(data);
       } catch (error) {
-        setError(error);
+        setErrorMessage(error.message);
       } finally {
         setLoading(false);
       }
@@ -58,13 +61,13 @@ export default function TransportByIdLayout() {
 
       setTransport(data);
     } catch (error) {
-      setError(error);
+      setErrorMessage(error);
     } finally {
       setLoading(false);
     }
   };
 
-  const onDelete = async (transportId: string) => {
+  const onDelete = async (transportId: number) => {
     try {
       setLoading(true);
 
@@ -74,7 +77,7 @@ export default function TransportByIdLayout() {
 
       router.back();
     } catch (error) {
-      setError(error);
+      setErrorMessage(error.message as string);
     } finally {
       setLoading(false);
     }
@@ -84,11 +87,10 @@ export default function TransportByIdLayout() {
     return "VETALIK LOADITSA...";
   }
 
-  if (error || !transport) {
+  if (errorMessage || !transport) {
     return (
       <div>
-        <p>Error:</p>
-        <div>{error.message}</div>
+        <p>Error: {errorMessage}</p>
       </div>
     );
   }
@@ -131,44 +133,4 @@ const titleStyle = {
   fontSize: "36px",
   fontWeight: "bold",
   marginBottom: "20px",
-};
-
-const formStyle = {
-  display: "flex",
-  flexDirection: "column",
-};
-
-const labelStyle = {
-  color: "#F0F0F0",
-  fontSize: "16px",
-  marginBottom: "8px",
-  textAlign: "left",
-};
-
-const inputStyle = {
-  width: "100%",
-  padding: "12px",
-  marginBottom: "20px",
-  fontSize: "16px",
-  borderRadius: "8px",
-  border: "1px solid #333",
-  backgroundColor: "#1A1A1D",
-  color: "#F0F0F0",
-};
-
-const selectStyle = {
-  ...inputStyle,
-};
-
-const buttonStyle = {
-  width: "100%",
-  padding: "14px",
-  fontSize: "18px",
-  fontWeight: "bold",
-  color: "#1A1A1D",
-  backgroundColor: "#FFA500",
-  border: "none",
-  borderRadius: "10px",
-  cursor: "pointer",
-  transition: "background 0.3s",
 };

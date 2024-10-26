@@ -19,6 +19,13 @@ export const fetchApi = async ({ endpoint, options, body }: FetchApiProps) => {
   };
 
   const response = await fetch(url, preparedOptions);
+
+  if (!response.ok) {
+    throw await response.json();
+  }
+
+  if (preparedOptions.method === "DELETE") return;
+
   return response.json();
 };
 
