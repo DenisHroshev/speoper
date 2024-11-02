@@ -1,4 +1,5 @@
-import { Router } from "next/router";
+"use client";
+import { navigate } from "@/common/services/navigate";
 
 interface FetchApiProps {
   endpoint: string;
@@ -27,7 +28,8 @@ export const fetchApi = async ({ endpoint, options, body }: FetchApiProps) => {
 
   if (response.status === 401) {
     localStorage.removeItem("token");
-    Router.push("/login");
+    return navigate("/login");
+    // redirect("/login", RedirectType.replace);
     return;
   }
 

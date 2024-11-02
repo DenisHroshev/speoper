@@ -18,6 +18,8 @@ export default function TransportsLayout() {
         setLoading(true);
         const endpoint = `/transports`;
         const data = await fetchApiGet({ endpoint });
+        if (!data) setErrorMessage("No data fount");
+
         setTransports(data);
       } catch (error) {
         // @ts-ignore

@@ -18,6 +18,8 @@ export default function OperationsLayout() {
         setLoading(true);
         const endpoint = `/operations`;
         const data = await fetchApiGet({ endpoint });
+        if (!data) setErrorMessage("No data fount");
+
         setOperations(data);
       } catch (error) {
         // @ts-ignore
