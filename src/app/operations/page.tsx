@@ -94,7 +94,7 @@ export default function OperationsLayout() {
               </td>
               <td style={cellStyle}>
                 {operation.latitude && operation.longitude
-                  ? `${operation.latitude.toFixed(2)}, ${operation.longitude.toFixed(2)}`
+                  ? `${operation.latitude}, ${operation.longitude}`
                   : "Location unavailable"}
               </td>
               <td style={cellStyle}>{operation.type}</td>

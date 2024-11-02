@@ -5,12 +5,17 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Operation } from "@/app/operations/common/types/Operation.type";
 import OperationForm from "@/app/operations/common/components/operation-form";
+import FillWithAiModal from "@/app/operations/common/components/fill-with-ai-modal";
 
 export default function OperationNewLayout() {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState(false);
   const [availableTransports, setAvailableTransports] = useState([]);
+  const [operation, setOperation] = useState<any>(null);
+
   const router = useRouter();
+
+  const [openFillWithAiModal, setOpenFillWithAiModal] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -51,7 +56,7 @@ export default function OperationNewLayout() {
           latitude: operationsUpdatePayload.latitude,
         }),
         ...(operationsUpdatePayload.longitude && {
-          latitude: operationsUpdatePayload.longitude,
+          longitude: operationsUpdatePayload.longitude,
         }),
       };
 
@@ -81,11 +86,21 @@ export default function OperationNewLayout() {
   }
 
   return (
-    <OperationForm
-      isNew
-      onSubmit={onSubmit}
-      submitButtonText={"Create"}
-      availableTransports={availableTransports}
-    />
+    <>
+      {openFillWithAiModal && (
+        <FillWithAiModal
+          setOpenFillWithAiModal={setOpenFillWithAiModal}
+          setOperation={setOperation}
+        />
+      )}
+      <OperationForm
+        isNew
+        onSubmit={onSubmit}
+        submitButtonText={"Create"}
+        availableTransports={availableTransports}
+        setOpenFillWithAiModal={setOpenFillWithAiModal}
+        operationData={operation}
+      />
+    </>
   );
 }

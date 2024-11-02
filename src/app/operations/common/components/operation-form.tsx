@@ -11,6 +11,7 @@ interface OperationsLayoutProps {
   onSubmit: (arg1: Operation) => void | Promise<void>;
   onDelete?: (arg1: number) => void | Promise<void>;
   availableTransports?: { id: number; name: string };
+  setOpenFillWithAiModal: (arg1: boolean) => void;
 }
 
 const defaultFormState = {
@@ -32,6 +33,7 @@ export default function OperationForm({
   isNew = false,
   onDelete = () => {},
   availableTransports,
+  setOpenFillWithAiModal,
 }: OperationsLayoutProps) {
   const [formData, setFormData] = useState<Operation>(
     defaultFormState as Operation,
@@ -60,7 +62,6 @@ export default function OperationForm({
   };
 
   const handleMultiSelectChange = (newValue) => {
-    console.log(newValue.map(({ value }) => value));
     setFormData((prevData) => ({
       ...prevData,
       transports: newValue.map(({ value }) => value),
@@ -68,12 +69,7 @@ export default function OperationForm({
   };
 
   useEffect(() => {
-    if (isNew) {
-      setFormData(defaultFormState as Operation);
-    }
-    if (!isNew && operationData) {
-      setFormData(operationData);
-    }
+    setFormData(operationData || defaultFormState);
   }, [operationData]);
 
   return (
@@ -117,9 +113,11 @@ export default function OperationForm({
             type="date"
             name="date"
             value={
-              formData.date.includes("T")
-                ? formData.date.split("T")[0]
-                : formData.date
+              formData.date
+                ? formData.date.includes("T")
+                  ? formData.date.split("T")[0]
+                  : formData.date
+                : ""
             }
             onChange={handleDateChange}
             style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
@@ -138,6 +136,7 @@ export default function OperationForm({
             style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
           />
         </div>
+
         <div style={{ marginBottom: "15px" }}>
           <label style={{ display: "block", marginBottom: "5px" }}>
             Longitude
@@ -150,7 +149,22 @@ export default function OperationForm({
             style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
           />
         </div>
-        <div style={{ marginBottom: "15px" }}>
+
+        {formData.latitude && formData.longitude && (
+          <a
+            href={`https://www.google.com/maps/search/?api=1&query=${formData.latitude},${formData.longitude}`}
+            target="_blank"
+            style={{
+              textAlign: "left",
+              color: "#4e6fe7",
+              cursor: "pointer",
+              textDecoration: "underline",
+            }}
+          >
+            Find on maps
+          </a>
+        )}
+        <div style={{ margin: "15px 0" }}>
           <label style={{ display: "block", marginBottom: "5px" }}>Type</label>
           <select
             name="type"
@@ -237,6 +251,7 @@ export default function OperationForm({
           >
             {submitButtonText}
           </button>
+
           {!isNew && (
             <button
               onClick={() => onDelete(operationData?.id as number)}
@@ -254,6 +269,26 @@ export default function OperationForm({
             </button>
           )}
         </div>
+        {isNew && (
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              setOpenFillWithAiModal(true);
+            }}
+            style={{
+              width: "100%",
+              padding: "10px",
+              backgroundColor: "#6926f1",
+              color: "#fff",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer",
+              marginTop: "10px",
+            }}
+          >
+            Fill with ai
+          </button>
+        )}
       </form>
     </div>
   );
