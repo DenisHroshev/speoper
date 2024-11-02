@@ -120,7 +120,7 @@ export default function FillWithAiModal({
             cursor: "pointer",
           }}
         >
-          Submit
+          {isLoading ? "Loading..." : "Create"}
         </button>
       </div>
     </div>
