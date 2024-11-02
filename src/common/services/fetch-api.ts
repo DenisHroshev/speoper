@@ -1,3 +1,5 @@
+import { Router } from "next/router";
+
 interface FetchApiProps {
   endpoint: string;
   options?: RequestInit;
@@ -9,16 +11,25 @@ const baseUrl = "http://localhost:3001";
 export const fetchApi = async ({ endpoint, options, body }: FetchApiProps) => {
   const url = baseUrl + endpoint;
   const preparedBody = body && { body: JSON.stringify(body) };
+  const token = localStorage.getItem("token");
+
   const preparedOptions = {
     ...options,
     ...(preparedBody && preparedBody),
     headers: {
       "Access-Control-Allow-Origin": "*",
+      ...(token && { Authorization: `Bearer ${token}` }),
       ...(body && { "Content-Type": "application/json" }),
     },
   };
 
   const response = await fetch(url, preparedOptions);
+
+  if (response.status === 401) {
+    localStorage.removeItem("token");
+    Router.push("/login");
+    return;
+  }
 
   if (!response.ok) {
     throw await response.json();
