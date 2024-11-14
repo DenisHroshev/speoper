@@ -74,7 +74,7 @@ export default function OperationNewLayout() {
   };
 
   if (loading) {
-    return "VETALIK LOADITSA...";
+    return "Завантаження...";
   }
 
   if (errorMessage) {
@@ -96,7 +96,7 @@ export default function OperationNewLayout() {
       <OperationForm
         isNew
         onSubmit={onSubmit}
-        submitButtonText={"Create"}
+        submitButtonText={"Створити"}
         availableTransports={availableTransports}
         setOpenFillWithAiModal={setOpenFillWithAiModal}
         operationData={operation}

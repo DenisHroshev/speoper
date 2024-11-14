@@ -102,7 +102,7 @@ export default function OperationByIdLayout() {
   };
 
   if (loading) {
-    return "VETALIK LOADITSA...";
+    return "Завантаження...";
   }
 
   if (errorMessage || !operation) {
@@ -120,7 +120,7 @@ export default function OperationByIdLayout() {
         <OperationForm
           operationData={operation}
           onSubmit={onSubmit}
-          submitButtonText={"Update"}
+          submitButtonText={"Оновити дані"}
           onDelete={onDelete}
           availableTransports={availableTransports}
         />
