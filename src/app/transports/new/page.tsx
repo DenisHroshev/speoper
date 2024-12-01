@@ -18,7 +18,7 @@ export default function TransportNewLayout() {
       const formData = {
         name: transportUpdatePayload.name,
         description: transportUpdatePayload.description,
-        peopleCapacity: transportUpdatePayload.peopleCapacity,
+        peopleCapacity: Number(transportUpdatePayload.peopleCapacity),
         type: transportUpdatePayload.type,
         photoUrl: transportUpdatePayload.photoUrl,
       };
@@ -38,7 +38,7 @@ export default function TransportNewLayout() {
   };
 
   if (loading) {
-    return "VETALIK LOADITSA...";
+    return "Завантаження...";
   }
 
   if (errorMessage) {

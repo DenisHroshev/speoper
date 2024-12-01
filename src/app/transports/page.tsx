@@ -35,7 +35,7 @@ export default function TransportsLayout() {
   };
 
   if (loading) {
-    return "VETALIK LOADITSA...";
+    return "Завантаження...";
   }
 
   if (errorMessage) {

@@ -53,10 +53,10 @@ export default function OperationNewLayout() {
           ({ id }) => id,
         ),
         ...(operationsUpdatePayload.latitude && {
-          latitude: operationsUpdatePayload.latitude,
+          latitude: Number(operationsUpdatePayload.latitude),
         }),
         ...(operationsUpdatePayload.longitude && {
-          longitude: operationsUpdatePayload.longitude,
+          longitude: Number(operationsUpdatePayload.longitude),
         }),
       };
 
