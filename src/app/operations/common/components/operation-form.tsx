@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { Operation } from "@/app/operations/common/types/Operation.type";
 import { OperationTypesEnum } from "@/app/operations/common/constants/operation-types.enum";
 import { OperationStatusesEnum } from "@/app/operations/common/constants/operation-statuses.enum";
@@ -10,7 +10,7 @@ interface OperationsLayoutProps {
   isNew: boolean;
   onSubmit: (arg1: Operation) => void | Promise<void>;
   onDelete?: (arg1: number) => void | Promise<void>;
-  availableTransports?: { id: number; name: string };
+  availableTransports?: { id: number; name: string }[];
   setOpenFillWithAiModal: (arg1: boolean) => void;
 }
 
@@ -26,6 +26,13 @@ const defaultFormState = {
   transports: [],
 };
 
+export const getFileAsLink = (file: File) =>
+  new Promise<string>((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => resolve(e.target.result as string);
+    reader.readAsDataURL(file);
+  });
+
 export default function OperationForm({
   operationData,
   onSubmit,
@@ -39,6 +46,14 @@ export default function OperationForm({
     defaultFormState as Operation,
   );
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [previewImage, setPreviewImage] = useState<string | null>(
+    operationData?.photoUrl,
+  );
+
+  const isDispatcher = useMemo(() => {
+    const isDispatcher = localStorage.getItem("isDispatcher");
+    return isDispatcher && JSON.parse(isDispatcher);
+  }, []);
 
   const handleChange = (e: { target: { name: any; value: any } }) => {
     const { name, value } = e.target;
@@ -46,10 +61,16 @@ export default function OperationForm({
   };
 
   const handleDateChange = (e: { target: { value: any } }) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      date: e.target.value,
-    }));
+    setFormData((prevData) => ({ ...prevData, date: e.target.value }));
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const fileLink = await getFileAsLink(file);
+      setFormData((prevData) => ({ ...prevData, photoUrl: fileLink }));
+      setPreviewImage(fileLink);
+    }
   };
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
@@ -83,6 +104,7 @@ export default function OperationForm({
       }}
     >
       <form onSubmit={handleSubmit}>
+        {/* Existing form inputs */}
         <div style={{ marginBottom: "15px" }}>
           <label style={{ display: "block", marginBottom: "5px" }}>Name</label>
           <input
@@ -92,6 +114,7 @@ export default function OperationForm({
             onChange={handleChange}
             style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
             required
+            disabled={!isDispatcher}
           />
         </div>
         <div style={{ marginBottom: "15px" }}>
@@ -105,6 +128,7 @@ export default function OperationForm({
             onChange={handleChange}
             style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
             required
+            disabled={!isDispatcher}
           />
         </div>
         <div style={{ marginBottom: "15px" }}>
@@ -122,6 +146,7 @@ export default function OperationForm({
             onChange={handleDateChange}
             style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
             required
+            disabled={!isDispatcher}
           />
         </div>
         <div style={{ marginBottom: "15px" }}>
@@ -134,9 +159,9 @@ export default function OperationForm({
             value={formData.latitude}
             onChange={handleChange}
             style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
+            disabled={!isDispatcher}
           />
         </div>
-
         <div style={{ marginBottom: "15px" }}>
           <label style={{ display: "block", marginBottom: "5px" }}>
             Longitude
@@ -147,6 +172,7 @@ export default function OperationForm({
             value={formData.longitude}
             onChange={handleChange}
             style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
+            disabled={!isDispatcher}
           />
         </div>
 
@@ -164,6 +190,7 @@ export default function OperationForm({
             Find on maps
           </a>
         )}
+
         <div style={{ margin: "15px 0" }}>
           <label style={{ display: "block", marginBottom: "5px" }}>Type</label>
           <select
@@ -171,6 +198,7 @@ export default function OperationForm({
             value={formData.type}
             onChange={handleChange}
             style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
+            disabled={!isDispatcher}
           >
             <option value="">Select a type</option>
             {Object.values(OperationTypesEnum).map((type, idx) => (
@@ -180,6 +208,7 @@ export default function OperationForm({
             ))}
           </select>
         </div>
+
         <div style={{ marginBottom: "15px" }}>
           <label style={{ display: "block", marginBottom: "5px" }}>
             Status
@@ -189,6 +218,7 @@ export default function OperationForm({
             value={formData.status}
             onChange={handleChange}
             style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
+            disabled={!isDispatcher}
           >
             <option value="">Select a status</option>
             {Object.values(OperationStatusesEnum).map((status, idx) => (
@@ -198,18 +228,27 @@ export default function OperationForm({
             ))}
           </select>
         </div>
+
         <div style={{ marginBottom: "15px" }}>
           <label style={{ display: "block", marginBottom: "5px" }}>
-            Photo URL
+            Image Upload
           </label>
           <input
-            type="text"
-            name="photoUrl"
-            value={formData.photoUrl}
-            onChange={handleChange}
+            type="file"
+            accept="image/*"
+            onChange={handleImageUpload}
             style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
+            disabled={!isDispatcher}
           />
+          {previewImage && (
+            <img
+              src={previewImage}
+              alt="Preview"
+              style={{ marginTop: "10px", maxWidth: "100%", height: "auto" }}
+            />
+          )}
         </div>
+
         <div style={{ marginBottom: "15px" }}>
           <label>Transports</label>
           <Select
@@ -227,49 +266,55 @@ export default function OperationForm({
             styles={{
               container: (base) => ({ ...base, width: "100%", color: "black" }),
             }}
+            isDisabled={!isDispatcher}
           />
         </div>
+
         {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <button
-            type="submit"
+
+        {isDispatcher && (
+          <div
             style={{
-              width: "100%",
-              padding: "10px",
-              backgroundColor: "#4CAF50",
-              color: "#fff",
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
             }}
           >
-            {submitButtonText}
-          </button>
-
-          {!isNew && (
             <button
-              onClick={() => onDelete(operationData?.id as number)}
+              type="submit"
               style={{
                 width: "100%",
                 padding: "10px",
-                backgroundColor: "#aa2020",
+                backgroundColor: "#4CAF50",
                 color: "#fff",
                 border: "none",
                 borderRadius: "4px",
                 cursor: "pointer",
               }}
             >
-              Delete
+              {submitButtonText}
             </button>
-          )}
-        </div>
-        {isNew && (
+
+            {!isNew && (
+              <button
+                onClick={() => onDelete(operationData?.id as number)}
+                style={{
+                  width: "100%",
+                  padding: "10px",
+                  backgroundColor: "#aa2020",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                }}
+              >
+                Delete
+              </button>
+            )}
+          </div>
+        )}
+
+        {isDispatcher && isNew && (
           <button
             onClick={(e) => {
               e.preventDefault();

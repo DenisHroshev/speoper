@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { fetchApiPost } from "@/common/services/fetch-api";
 import { useRouter } from "next/navigation";
+import { TransportTypes } from "@/app/transports/common/constants/transport-types.enum";
 
 const LoginPageModes = {
   LOGIN: "login",
@@ -11,16 +12,19 @@ const LoginPageModes = {
 
 export default function LoginPage() {
   const router = useRouter();
-  const [mode, setMode] = useState<
-    typeof LoginPageModes.LOGIN | typeof LoginPageModes.REGISTRATION
-  >(LoginPageModes.LOGIN);
+
+  const [mode, setMode] = useState<"login" | "registration">(
+    LoginPageModes.LOGIN,
+  );
   const isLogin = mode === LoginPageModes.LOGIN;
 
+  // State variables
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [email, setEmail] = useState<string | null>("");
   const [password, setPassword] = useState<string | null>("");
   const [displayPassword, setDisplayPassword] = useState<boolean>(false);
+  const [serviceType, setServiceType] = useState<string>("");
 
   const onModeSwitch = () => {
     setMode(isLogin ? LoginPageModes.REGISTRATION : LoginPageModes.LOGIN);
@@ -32,22 +36,26 @@ export default function LoginPage() {
   };
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     try {
       setError(null);
       setIsLoading(true);
-      e.preventDefault();
 
       const endpoint = `/auth/${mode}`;
+      const body = { email, password };
 
-      const { accessToken } = await fetchApiPost({
+      if (!isLogin) {
+        body.serviceType = serviceType; // Add the serviceType when registering
+      }
+
+      const { accessToken, isDispatcher } = await fetchApiPost({
         endpoint,
-        body: { email, password },
+        body,
       });
-
       localStorage.setItem("token", accessToken);
-
+      localStorage.setItem("isDispatcher", isDispatcher);
       router.push("operations");
-    } catch (error) {
+    } catch (error: any) {
       setError(error.message);
     } finally {
       setIsLoading(false);
@@ -100,6 +108,28 @@ export default function LoginPage() {
             />
           </div>
 
+          {!isLogin && (
+            <div style={formGroupStyle}>
+              <label htmlFor="serviceType" style={labelStyle}>
+                User Type
+              </label>
+              <select
+                id="serviceType"
+                name="serviceType"
+                style={inputStyle}
+                value={serviceType}
+                onChange={(e) => setServiceType(e.target.value)}
+              >
+                <option value="">Select a type</option>
+                {Object.entries(TransportTypes).map(([key, value]) => (
+                  <option key={key} value={value}>
+                    {value}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
           {error && (
             <div style={{ color: "red" }}>
               {Array.isArray(error) ? (
@@ -122,7 +152,7 @@ export default function LoginPage() {
             }}
             onClick={onModeSwitch}
           >
-            {isLogin ? "switch to registration" : "Have a account? Login"}
+            {isLogin ? "switch to registration" : "Have an account? Login"}
           </a>
           <button type="submit" style={buttonStyle} disabled={isLoading}>
             {isLogin ? "Війти" : "Зареєструватись"}
@@ -133,7 +163,7 @@ export default function LoginPage() {
   );
 }
 
-// Стилі для сторінки, форми, полів введення та кнопки
+// Styles for the page, form, input fields, and button
 const containerStyle = {
   display: "flex",
   justifyContent: "center",

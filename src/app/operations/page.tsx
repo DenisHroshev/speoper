@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { fetchApiGet } from "@/common/services/fetch-api";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -11,6 +11,12 @@ export default function OperationsLayout() {
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState(null);
   const router = useRouter();
+
+  const isDispatcher = useMemo(() => {
+    const isDispatcher = localStorage.getItem("isDispatcher");
+
+    return isDispatcher && JSON.parse(isDispatcher);
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -40,23 +46,25 @@ export default function OperationsLayout() {
 
   if (errorMessage) {
     return (
-        <div style={errorContainerStyle}>
-          <p>Error: {errorMessage}</p>
-        </div>
+      <div style={errorContainerStyle}>
+        <p>Error: {errorMessage}</p>
+      </div>
     );
   }
 
   return (
-      <div style={layoutStyle}>
-        <h1 style={titleStyle}>Список операццій</h1>
+    <div style={layoutStyle}>
+      <h1 style={titleStyle}>Список операццій</h1>
+      {isDispatcher && (
         <div style={buttonContainerStyle}>
           <Link href="/operations/new">
             <button style={buttonStyle}>Створити операцію</button>
           </Link>
         </div>
+      )}
 
-        <table style={tableStyle}>
-          <thead>
+      <table style={tableStyle}>
+        <thead>
           <tr>
             <th style={headerCellStyle}>Фото</th>
             <th style={headerCellStyle}>Назва</th>
@@ -66,44 +74,44 @@ export default function OperationsLayout() {
             <th style={headerCellStyle}>Тип</th>
             <th style={headerCellStyle}>Статус</th>
           </tr>
-          </thead>
-          <tbody>
+        </thead>
+        <tbody>
           {operations.map((operation) => (
-              <tr
-                  key={operation.id}
-                  onClick={() => handleRowClick(operation.id)}
-                  style={rowStyle}
-              >
-                <td style={cellStyle}>
-                  {operation.photoUrl ? (
-                      <img
-                          src={operation.photoUrl}
-                          alt={operation.name}
-                          style={imageStyle}
-                      />
-                  ) : (
-                      "No Image"
-                  )}
-                </td>
-                <td style={cellStyle}>{operation.name}</td>
-                <td style={cellStyle}>{operation.description}</td>
-                <td style={cellStyle}>
-                  {operation.date
-                      ? new Date(operation.date).toLocaleDateString()
-                      : "N/A"}
-                </td>
-                <td style={cellStyle}>
-                  {operation.latitude && operation.longitude
-                      ? `${operation.latitude}, ${operation.longitude}`
-                      : "Локацію не знайдено"}
-                </td>
-                <td style={cellStyle}>{operation.type}</td>
-                <td style={cellStyle}>{operation.status}</td>
-              </tr>
+            <tr
+              key={operation.id}
+              onClick={() => handleRowClick(operation.id)}
+              style={rowStyle}
+            >
+              <td style={cellStyle}>
+                {operation.photoUrl ? (
+                  <img
+                    src={operation.photoUrl}
+                    alt={operation.name}
+                    style={imageStyle}
+                  />
+                ) : (
+                  "No Image"
+                )}
+              </td>
+              <td style={cellStyle}>{operation.name}</td>
+              <td style={cellStyle}>{operation.description}</td>
+              <td style={cellStyle}>
+                {operation.date
+                  ? new Date(operation.date).toLocaleDateString()
+                  : "N/A"}
+              </td>
+              <td style={cellStyle}>
+                {operation.latitude && operation.longitude
+                  ? `${operation.latitude}, ${operation.longitude}`
+                  : "Локацію не знайдено"}
+              </td>
+              <td style={cellStyle}>{operation.type}</td>
+              <td style={cellStyle}>{operation.status}</td>
+            </tr>
           ))}
-          </tbody>
-        </table>
-      </div>
+        </tbody>
+      </table>
+    </div>
   );
 }
 

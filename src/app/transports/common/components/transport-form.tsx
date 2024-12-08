@@ -26,12 +26,29 @@ export default function TransportForm({
   onDelete = () => {},
 }: TransportsLayoutProps) {
   const [formData, setFormData] = useState<Transport>({} as Transport);
-
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+
+  const isDispatcher = useMemo(() => {
+    const isDispatcher = localStorage.getItem("isDispatcher");
+    return isDispatcher && JSON.parse(isDispatcher);
+  }, []);
 
   const handleChange = (e: { target: { name: any; value: any } }) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const imageUrl = await getFileAsLink(file);
+      setPreviewImage(imageUrl as string); // Set the preview
+      setFormData((prevData) => ({
+        ...prevData,
+        photoUrl: imageUrl as string,
+      }));
+    }
   };
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
@@ -45,11 +62,12 @@ export default function TransportForm({
 
   useEffect(() => {
     if (isNew) {
-      // @ts-ignore
       setFormData(defaultFormState);
+      setPreviewImage(null);
     }
     if (!isNew && transportData) {
       setFormData(transportData);
+      setPreviewImage(transportData.photoUrl);
     }
   }, [transportData]);
 
@@ -73,6 +91,7 @@ export default function TransportForm({
             onChange={handleChange}
             style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
             required
+            disabled={!isDispatcher}
           />
         </div>
 
@@ -87,6 +106,7 @@ export default function TransportForm({
             onChange={handleChange}
             style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
             required
+            disabled={!isDispatcher}
           />
         </div>
 
@@ -101,6 +121,7 @@ export default function TransportForm({
             onChange={handleChange}
             style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
             required
+            disabled={!isDispatcher}
           />
         </div>
 
@@ -111,6 +132,7 @@ export default function TransportForm({
             value={formData.type}
             onChange={handleChange}
             style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
+            disabled={!isDispatcher}
           >
             <option value="">Select a type</option>
             {Object.values(TransportTypes).map((type, idx) => (
@@ -123,59 +145,79 @@ export default function TransportForm({
 
         <div style={{ marginBottom: "15px" }}>
           <label style={{ display: "block", marginBottom: "5px" }}>
-            Photo URL
+            Upload Photo
           </label>
           <input
-            type="text"
-            name="photoUrl"
-            value={formData.photoUrl}
-            onChange={handleChange}
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
             style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
+            disabled={!isDispatcher}
           />
+          {previewImage && (
+            <div style={{ marginTop: "10px" }}>
+              <img
+                src={previewImage}
+                alt="Preview"
+                style={{ maxWidth: "100%" }}
+              />
+            </div>
+          )}
         </div>
 
         {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <button
-            type="submit"
+        {isDispatcher && (
+          <div
             style={{
-              width: "100%",
-              padding: "10px",
-              backgroundColor: "#4CAF50",
-              color: "#fff",
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
             }}
           >
-            {submitButtonText}
-          </button>
-
-          {!isNew && (
             <button
-              onClick={() => onDelete(transportData?.id as number)}
+              type="submit"
               style={{
                 width: "100%",
                 padding: "10px",
-                backgroundColor: "#aa2020",
+                backgroundColor: "#4CAF50",
                 color: "#fff",
                 border: "none",
                 borderRadius: "4px",
                 cursor: "pointer",
               }}
             >
-              delete
+              {submitButtonText}
             </button>
-          )}
-        </div>
+            {!isNew && (
+              <button
+                onClick={() => onDelete(transportData?.id as number)}
+                style={{
+                  width: "100%",
+                  padding: "10px",
+                  backgroundColor: "#aa2020",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                }}
+              >
+                delete
+              </button>
+            )}
+          </div>
+        )}
       </form>
     </div>
   );
 }
+
+// Function to get a file as a base64 data URL
+export const getFileAsLink = (
+  file: File,
+): Promise<string | ArrayBuffer | null> =>
+  new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => resolve(e.target?.result);
+    reader.readAsDataURL(file);
+  });

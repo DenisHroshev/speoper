@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { fetchApiGet } from "@/common/services/fetch-api";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -11,6 +11,12 @@ export default function TransportsLayout() {
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState(null);
   const router = useRouter();
+
+  const isDispatcher = useMemo(() => {
+    const isDispatcher = localStorage.getItem("isDispatcher");
+
+    return isDispatcher && JSON.parse(isDispatcher);
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -49,11 +55,13 @@ export default function TransportsLayout() {
   return (
     <div style={layoutStyle}>
       <h1 style={titleStyle}>Transport List</h1>
-      <div style={buttonContainerStyle}>
-        <Link href="/transports/new">
-          <button style={buttonStyle}>Create new</button>
-        </Link>
-      </div>
+      {isDispatcher && (
+        <div style={buttonContainerStyle}>
+          <Link href="/transports/new">
+            <button style={buttonStyle}>Create new</button>
+          </Link>
+        </div>
+      )}
 
       <table style={tableStyle}>
         <thead>

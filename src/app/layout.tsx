@@ -1,10 +1,11 @@
 "use client";
 
+import { useEffect } from "react";
 import localFont from "next/font/local";
-import "./globals.css";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
+import "./globals.css";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -18,13 +19,17 @@ const geistMono = localFont({
 });
 
 export default function RootLayout({
-                                     children,
-                                   }: Readonly<{
+  children,
+}: Readonly<{
   children: React.ReactNode;
 }>) {
   const router = useRouter();
   const pathname = usePathname();
   const isLoggedIn = !!localStorage.getItem("token");
+
+  useEffect(() => {
+    document.title = "SpecOper App";
+  }, []);
 
   const onLogout = (e) => {
     e.preventDefault();
@@ -33,56 +38,57 @@ export default function RootLayout({
   };
 
   return (
-      <html lang="en">
+    <html lang="en">
       <body
-          className={`${geistSans.variable} ${geistMono.variable}`}
-          style={bodyStyle}
+        className={`${geistSans.variable} ${geistMono.variable}`}
+        style={bodyStyle}
       >
-      <header
+        <header
           style={{
             ...headerStyle,
             borderBottom: pathname === "/" ? "none" : "2px solid #333",
-            boxShadow: pathname === "/" ? "0px 4px 6px rgba(0, 0, 0, 0.5)" : "none",
+            boxShadow:
+              pathname === "/" ? "0px 4px 6px rgba(0, 0, 0, 0.5)" : "none",
           }}
-      >
-        <div style={logoStyle}>
-          <Link href="/" passHref>
-            <div style={logoContainerStyle}>
-              <Image
+        >
+          <div style={logoStyle}>
+            <Link href="/" passHref>
+              <div style={logoContainerStyle}>
+                <Image
                   src="/images/logo.png"
                   alt="Logo"
                   width={40}
                   height={40}
                   style={logoImageStyle}
-              />
-              <span style={logoTextStyle}>SPECOPER</span>
-            </div>
-          </Link>
-        </div>
-        <nav style={menuStyle}>
-          <Link href="/" style={menuItemStyle}>
-            Головна
-          </Link>
-          <Link href="/operations" style={menuItemStyle}>
-            Операції
-          </Link>
-          <Link href="/transports" style={menuItemStyle}>
-            Транспорт
-          </Link>
-          {isLoggedIn ? (
+                />
+                <span style={logoTextStyle}>SPECOPER</span>
+              </div>
+            </Link>
+          </div>
+          <nav style={menuStyle}>
+            <Link href="/" style={menuItemStyle}>
+              Головна
+            </Link>
+            <Link href="/operations" style={menuItemStyle}>
+              Операції
+            </Link>
+            <Link href="/transports" style={menuItemStyle}>
+              Транспорт
+            </Link>
+            {isLoggedIn ? (
               <a style={menuItemStyle} onClick={onLogout}>
                 Вихід
               </a>
-          ) : (
+            ) : (
               <Link href="/login" style={menuItemStyle}>
                 Вхід
               </Link>
-          )}
-        </nav>
-      </header>
-      {children}
+            )}
+          </nav>
+        </header>
+        {children}
       </body>
-      </html>
+    </html>
   );
 }
 
@@ -95,7 +101,6 @@ const bodyStyle = {
   fontFamily: "'Roboto', sans-serif",
   overflow: "hidden", // Забороняємо прокрутку на рівні сторінки
 };
-
 
 const headerStyle = {
   display: "flex",
